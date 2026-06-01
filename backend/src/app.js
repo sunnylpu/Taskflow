@@ -56,6 +56,12 @@ app.use(
 // Disable x-powered-by header (don't reveal Express)
 app.disable('x-powered-by');
 
+// ── Trust Proxy (required on Vercel / behind load balancers) ─────────────────
+// Vercel routes all requests through a proxy that sets X-Forwarded-For.
+// Without this, express-rate-limit v7 throws a ValidationError.
+// Value `1` = trust exactly one proxy hop (Vercel's load balancer only).
+app.set('trust proxy', 1);
+
 // ── CORS — Strict Origin Allowlist ────────────────────────────────────────────
 const allowedOrigins = (process.env.ALLOWED_ORIGIN || 'http://localhost:5173')
   .split(',')
