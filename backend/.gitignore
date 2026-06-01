@@ -1,0 +1,7 @@
+.env
+node_modules/
+dist/
+build/
+*.log
+jwt_secret.txt
+prisma/migrations/*.sql

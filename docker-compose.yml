@@ -1,0 +1,44 @@
+services:
+  # ─── PostgreSQL Database ───────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskflow_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: taskflow_user
+      POSTGRES_PASSWORD: taskflow_pass
+      POSTGRES_DB: taskflow_db
+    ports:
+      - "127.0.0.1:5432:5432"   # Bind to localhost only — not 0.0.0.0
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskflow_user -d taskflow_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Backend API ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: taskflow_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://taskflow_user:taskflow_pass@postgres:5432/taskflow_db
+      PORT: 3001
+      NODE_ENV: production
+      ALLOWED_ORIGIN: http://localhost:5173
+      JWT_EXPIRES_IN: 7d
+      # IMPORTANT: Set JWT_SECRET via environment or secrets manager in production
+      # JWT_SECRET: <set-via-env-or-secrets-manager>
+    ports:
+      - "127.0.0.1:3001:3001"
+    command: sh -c "npx prisma migrate deploy && node server.js"
+
+volumes:
+  postgres_data:

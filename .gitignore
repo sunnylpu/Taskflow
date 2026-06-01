@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Environment files (NEVER commit these)
+.env
+.env.local
+.env.production.local
+
+# Build outputs
+dist/
+build/
+.next/
+
+# Secrets
+jwt_secret.txt
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel/
+
+# Prisma (keep schema, ignore generated client)
+# node_modules/@prisma is excluded via node_modules above
+node_modules/
+.env
+dist/
