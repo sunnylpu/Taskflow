@@ -5,6 +5,7 @@
  * Accessible at: GET /api/docs
  */
 
+const path = require('path');
 const swaggerJsdoc = require('swagger-jsdoc');
 
 const options = {
@@ -41,8 +42,10 @@ Authorization: Bearer <your_jwt_token>
     },
     servers: [
       {
-        url: 'http://localhost:3001',
-        description: 'Development server',
+        url: process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : 'http://localhost:3001',
+        description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server',
       },
     ],
     components: {
@@ -88,7 +91,8 @@ Authorization: Bearer <your_jwt_token>
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: ['./src/routes/v1/*.js'],
+  // Use __dirname-based absolute path — works on Vercel serverless filesystem
+  apis: [path.join(__dirname, '../routes/v1/*.js')],
 };
 
 const swaggerSpec = swaggerJsdoc(options);

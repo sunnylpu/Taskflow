@@ -8,6 +8,17 @@
 const { PrismaClient } = require('@prisma/client');
 const logger = require('../utils/logger');
 
+// ── Validate DATABASE_URL before construction ─────────────────────────────────
+// Prisma 5.x throws a cryptic error if DATABASE_URL is missing.
+// This gives a clear message in Vercel logs.
+if (!process.env.DATABASE_URL) {
+  const msg =
+    'FATAL: DATABASE_URL environment variable is not set. ' +
+    'Set it in Vercel → Project → Settings → Environment Variables.';
+  logger.error(msg);
+  throw new Error(msg);
+}
+
 // In development, attach the client to global to prevent exhausting connections
 // during hot-reload. In production, this is just a module-level singleton.
 const globalForPrisma = globalThis;
@@ -32,3 +43,4 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 module.exports = prisma;
+
